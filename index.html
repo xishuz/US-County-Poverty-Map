@@ -18,6 +18,17 @@
         h1 {
             font-family: 'Franklin Gothic Medium'
         }
+
+        .pop-up {
+            position: absolute; 
+            border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2;
+            width: 200px;
+            pointer-events: none;
+            background-color: white;
+            padding: 10px;
+        }
     </style>
     <!-- add your script blocks at the end -->
 
@@ -29,7 +40,7 @@
             US County Poverty Map
         </h1>
 
-        <svg width="900px" height="500px">
+        <svg width="1000px" height="600px">
 
         </svg>
     </div>
@@ -60,7 +71,7 @@
             let county = topojson.feature(raw, raw.objects.county);
             let state = topojson.feature(raw, raw.objects.state);
             let width = 1050;
-            let height = 500;
+            let height = 600;
 
             // parsing data
             data2.forEach(d => {
@@ -90,13 +101,14 @@
 
             let popup = d3.select(".pop-up");
 
+            let shuffled = d3.shuffle(county.features);
             let counties = svg
                 .selectAll(".counties")
-                .data(county.features)
+                .data(shuffled)
                 .join("circle")
                 .attr("class", function (d) { return "points p-" + d.leaidC }) 
                 .attr("r", d => { 
-                    return Math.sqrt(d.properties.POV)/20
+                    return Math.sqrt(d.properties.POV)/10
                     })
                 .attr("cx", d => {
                     path.centroid(d)
@@ -108,7 +120,8 @@
                 .style("stroke", "#333333")
                 .style("stroke-width", .5)
                 .style("fill", "#c0cad8")
-            
+                .style("pointer-events", "auto")
+                
             let states = svg.append("g")
                 .selectAll(".states")
                 .data(state.features)
@@ -118,17 +131,20 @@
                 .style("fill", "none")
                 .style("stroke", "#333")
                 .style("stroke-width", 1)
+                .style("opacity", .5)
+                .style("pointer-events", "none")
             
             counties.on("mouseover", (event, d) => {
 
                 counties
-                    .style("fill", "#710")
-                    .style("stroke", "null")
-                    .style("fill-opacity", .5)
+                    .style("stroke", "#333333")
+                    .style("stroke-width", .5)
+                    .style("fill", "#c0cad8")
+                    .style("opacity", .5)
 
                 svg.select(".p-" + d.leaidC)
                     .style("stroke", "black")
-                    .style("stroke-width", 2)
+                    .style("stroke-width", 1)
                     .style("fill", "yellow")
                     .style("fill-opacity", 1)
                     .raise()
@@ -144,7 +160,6 @@
 
 
             counties.on("mouseout", (event, d) => {
-                console.log(event)
                 counties
                     .style("stroke", "#333333")
                     .style("stroke-width", .5)
