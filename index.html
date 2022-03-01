@@ -43,6 +43,8 @@
         <svg width="1000px" height="600px">
 
         </svg>
+        <div class="pop-up">
+        </div>
     </div>
 </body>
 
@@ -83,9 +85,6 @@
                         county.features[i].properties.POV = d.pop_18_in_poverty
                 }
             })
-            console.log(county.features[0].properties.GEOID)
-            console.log(county, state)
-            console.log(data2)
 
             let svg = d3.select("body").select("svg")
 
@@ -102,11 +101,11 @@
             let popup = d3.select(".pop-up");
 
             let shuffled = d3.shuffle(county.features);
-            let counties = svg
+            let counties = svg.append("g")
                 .selectAll(".counties")
                 .data(shuffled)
                 .join("circle")
-                .attr("class", function (d) { return "points p-" + d.leaidC }) 
+                .attr("class", function (d) { return "points p-" + d.properties.NAME }) 
                 .attr("r", d => { 
                     return Math.sqrt(d.properties.POV)/10
                     })
@@ -120,7 +119,6 @@
                 .style("stroke", "#333333")
                 .style("stroke-width", .5)
                 .style("fill", "#c0cad8")
-                .style("pointer-events", "auto")
                 
             let states = svg.append("g")
                 .selectAll(".states")
@@ -131,30 +129,29 @@
                 .style("fill", "none")
                 .style("stroke", "#333")
                 .style("stroke-width", 1)
-                .style("opacity", .5)
-                .style("pointer-events", "none")
-            
+                .style("opacity", .7)
+
             counties.on("mouseover", (event, d) => {
 
                 counties
                     .style("stroke", "#333333")
                     .style("stroke-width", .5)
                     .style("fill", "#c0cad8")
-                    .style("opacity", .5)
+                    .style("opacity", .7)
 
-                svg.select(".p-" + d.leaidC)
+                svg.select(".p-" + d.properties.NAME)
                     .style("stroke", "black")
                     .style("stroke-width", 1)
                     .style("fill", "yellow")
                     .style("fill-opacity", 1)
                     .raise()
 
-                let lang = "County Name:" + d.properties.Name + ", " + d.properties.POV + " people in Povety."
+                let lang = "County Name:" + d.properties.NAME + ", " + d.properties.POV + " people in Povety."
                 
                 popup
                     .style("opacity", 1)
-                    .style("left", (event.x - 100) + "px")
-                    .style("top", (event.y - 150) + "px")
+                    .style("left", (event.x - 20) + "px")
+                    .style("top", (event.y + 20) + "px")
                     .html(lang)
             })
 
